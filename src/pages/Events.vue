@@ -2,14 +2,14 @@
 	<vuestro-container no-wrap shrink class="events-container">
 		<vuestro-card cols="3" color="var(--vuestro-green)">
 			<template #heading>
-				<span class="events-toolbar">
+				<vuestro-container gutter="none" align="center">
 					<span>Events</span>
 					<vuestro-button round no-border variant="text" @click="toggleEventSortDirection">
 						<vuestro-icon v-if="eventSortAsc" name="arrow-up"></vuestro-icon>
 						<vuestro-icon v-else name="arrow-down"></vuestro-icon>
 					</vuestro-button>
-				</span>
-				<span class="events-toolbar">
+				</vuestro-container>
+				<vuestro-container gutter="none" align="center" justify="flex-end">
 					<vuestro-button pill value no-border variant="success" @click="createOpen = true">
 						<template #icon>
 							<vuestro-icon name="plus"></vuestro-icon>
@@ -19,13 +19,13 @@
 					<vuestro-button round no-border @click="onClear">
 						<vuestro-icon name="trash"></vuestro-icon>
 					</vuestro-button>
-				</span>
+				</vuestro-container>
 			</template>
 			<template #description>
 			</template>
 			<div class="events-sidebar">
 				<div>
-					<vuestro-search-box history placeholder="Search" v-model="searchTerm" @input="onSearch"></vuestro-search-box>
+					<vuestro-text-field variant="search" v-model="searchTerm" @input="onSearch"></vuestro-text-field>
 				</div>
 				<div class="events-list">
 					<div v-if="filteredEvents.length == 0" class="no-data">No events, yet...</div>
@@ -138,10 +138,6 @@ export default {
 
 <style scoped>
 
-.events-container {
-	overflow: hidden;
-}
-
 .event {
 	padding: 5px 10px;
 	display: flex;
@@ -174,9 +170,6 @@ export default {
 	font-weight: 300;
 	text-align: center;
 	padding: 20px;
-}
-.events-toolbar {
-	display: flex;
 }
 
 </style>

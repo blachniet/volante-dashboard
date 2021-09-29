@@ -31,6 +31,21 @@ module.exports = {
         clients: [],
       });
     }
+
+  },
+  updated() {
+    // register a star spoke only if enabled to forward all events client side for connected volante-dashboards
+    if (this.enabled) {
+      this.$hub.onAll((...args) => {
+        if (!args[0].startsWith('VolanteDashboard')) { // prevent loops
+          this.lastEvents++;
+          this.totalEvents++;
+          if (this.io) {
+            this.io.of('/volante-dashboard').emit('volante.event', ...args);
+          }
+        }
+      });
+    }
   },
   done() {
     this.timer && clearInterval(this.timer);
@@ -103,19 +118,7 @@ module.exports = {
     },
     // start socket.io when express is ready
     'VolanteExpress.listening'(obj) {
-      if (this.enabled) {
-        this.startSocketIO(obj.server);
-      }
-    },
-    // catch all volante events and forward to all clients
-    '*'(...args) {
-      if (this.enabled && !args[0].startsWith('VolanteDashboard')) { // prevent loops
-        this.lastEvents++;
-        this.totalEvents++;
-        if (this.io) {
-          this.io.of('/volante-dashboard').emit('volante.event', ...args);
-        }
-      }
+      this.startSocketIO(obj.server);
     },
     // sanity check event
     'hello.world'(...args) {
@@ -149,6 +152,12 @@ module.exports = {
         this.sendAppInfo(client);
         this.sendVolanteInfo(client);
         // receive events from client side to re-emit on volante
+        // example:
+        // Vue.socket.emit('event', {
+        //   eventType: sendEventType,
+        //   eventArgs: sendEventArgs,
+        //   eventCallback: true,
+        // });
         client.on('event', (data) => {
           this.$debug('volante-dashboard socket.io event from client', data);
           if (data.eventCallback) {

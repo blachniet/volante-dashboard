@@ -15,7 +15,7 @@ export default {
   data() {
     return {
       cpuOptions: {
-        categoryKey: 'ts',
+        categoryField: 'ts',
         slide: true,
         transition: 5000,
         series: [
@@ -29,7 +29,7 @@ export default {
         ],
       },
       memOptions: {
-        categoryKey: 'ts',
+        categoryField: 'ts',
         slide: true,
         transition: 5000,
         series: [
@@ -42,7 +42,7 @@ export default {
         ],
       },
       eventOptions: {
-        categoryKey: 'ts',
+        categoryField: 'ts',
         slide: true,
         transition: 5000,
         series: [
