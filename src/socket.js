@@ -28,8 +28,5 @@ export default {
       store.dispatch('setStats', d.stats);
     });
 
-    Vue.socket.on('callback-result', (d) => {
-      store.dispatch('setLastCallbackResult', d);
-    });
   }
 };

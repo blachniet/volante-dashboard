@@ -94,7 +94,7 @@ export default {
       }
     },
     onDataChange(k, v) {
-      Vue.socket.emit('spoke.update', {
+      Vue.socket.emit('volante.spoke.update', {
         name: this.selectedSpoke.name,
         key: k,
         val: v,

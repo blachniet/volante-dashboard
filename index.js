@@ -156,21 +156,24 @@ module.exports = {
         // Vue.socket.emit('event', {
         //   eventType: sendEventType,
         //   eventArgs: sendEventArgs,
-        //   eventCallback: true,
+        //   eventCallback: set to name of event to emit (usually a nonce)
         // });
-        client.on('event', (data) => {
-          this.$debug('volante-dashboard socket.io event from client', data);
+        client.on('volante', (data) => {
+          this.$debug('volante-dashboard got volante event from client over socket.io', data);
           if (data.eventCallback) {
             // if eventCallback set, add a callback to the end the event args
             // for the handler to call
             data.eventArgs.push(function (err, result) {
-              client.emit('callback-result', [err, result]);
+              // re-emit with the value of eventCallback as the event name
+              // args are array of standard callback form (err, result)
+              client.emit(data.eventCallback, [err, result]);
             });
           }
+          // emit the event to the volante wheel
           this.$emit(data.eventType, ...data.eventArgs);
         });
         // process events to edit volante spoke state
-        client.on('spoke.update', (spokeData) => {
+        client.on('volante.spoke.update', (spokeData) => {
           this.$debug('volante-dashboard updating spoke module', spokeData);
           let spoke = this.$hub.getInstanceByName(spokeData.name);
           if (spoke) {

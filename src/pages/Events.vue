@@ -30,13 +30,11 @@
 				<div class="events-list">
 					<div v-if="filteredEvents.length == 0" class="no-data">No events, yet...</div>
 
-					<vuestro-list-item v-for="(e, idx) in filteredEvents" :key="e.ts"
+					<vuestro-list-item v-for="(e, idx) in filteredEvents" :key="idx"
 					                   :selected="idx == currentIdx"
 					                   @click="onSelectEvent(idx, e)">
-						<template #icon>
-						</template>
 						<template #title>{{ e.eventType }}</template>
-						<template #description>{{ e.ts | vuestroHMS }}</template>
+						<template #description>{{ e.ts | vuestroDate }}</template>
 						<template #buttons>
 							<vuestro-button round no-border variant="text" @click="reEmit(e)">
 								<vuestro-icon name="share-square"></vuestro-icon>

@@ -8,7 +8,6 @@ export default new Vuex.Store({
     title: 'volante',
     version: '0.0.0',
     events: [],
-    lastCallbackResult: null, // store result of callback for interactive eventing
     logEvents: [],
     stats: [],
     uptime: null,
@@ -57,9 +56,6 @@ export default new Vuex.Store({
       return _.filter(state.logEvents, function(o) {
         return o.eventArgs[0].lvl === 'error';
       });
-    },
-    lastCallbackResult(state) {
-      return state.lastCallbackResult;
     },
     allHandledEvents(state) {
       let ret = [];
@@ -118,9 +114,6 @@ export default new Vuex.Store({
     },
     setTopology({ commit }, topology) {
       commit('setTopology', topology);
-    },
-    setLastCallbackResult({ commit }, result) {
-      commit('setLastCallbackResult', result);
     },
     toggleSidebar({ commit }) {
       commit('toggleSidebar');
@@ -203,12 +196,6 @@ export default new Vuex.Store({
           target: cnt++,
         });
       }
-    },
-    setLastCallbackResult(state, result) {
-      state.lastCallbackResult = {
-        ts: new Date(),
-        result,
-      };
     },
     toggleSidebar(state) {
       state.savedSettings.isMiniSidebar = !state.savedSettings.isMiniSidebar;

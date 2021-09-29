@@ -7,7 +7,13 @@
 		</template>
 		<vuestro-container>
 			<vuestro-card>
-				<vuestro-text-field variant="outline" size="lg" v-model="sendEventType" placeholder="Event Type" hint="e.g. hello.world" :presets="allHandledEvents" @preset="openForEvent"></vuestro-text-field>
+				<vuestro-text-field variant="outline" size="lg" v-model="sendEventType" placeholder="Event Type" hint="e.g. hello.world">
+				  <template #dropdown="{ closeDropdown }">
+				    <vuestro-list-button v-for="e in allHandledEvents" :key="e" @click="() => { openForEvent(e); closeDropdown(); }">
+  				    {{ e }}
+				    </vuestro-list-button>
+				  </template>
+				</vuestro-text-field>
 				<div style="height: 20px"></div>
   			<vuestro-panel gutter="none" collapsible>
   			  <template #title>Event Arguments (as JSON)</template>
@@ -38,8 +44,13 @@
 			  <vuestro-panel v-if="provideCallback" collapsible overflow-hidden>
 			    <template #title>Last Callback Result</template>
 			    <template #toolbar>
-			      <span v-if="lastCallbackResult && lastCallbackResult.ts">{{ lastCallbackResult.ts | vuestroHMS }}</span>
-			      <vuestro-button round no-border @click="$store.dispatch('setLastCallbackResult', null)">
+			      <vuestro-pill v-if="lastCallbackResult && lastCallbackResult.elapsed"
+			                    variant="capsule"
+			                    size="sm">
+			        <template #title>Elapsed</template>
+			        <template #value>{{ lastCallbackResult.elapsed }}ms</template>
+		        </vuestro-pill>
+			      <vuestro-button round no-border @click="lastCallbackResult = null">
 			        <vuestro-icon name="ban"></vuestro-icon>
 			      </vuestro-button>
 			      <vuestro-button round no-border @click="vuestroDownloadAsJson(lastCallbackResult.result, 'result.json')">
@@ -98,10 +109,11 @@ export default {
       },
       provideCallback: false,
       resizingIdx: null,
+      lastCallbackResult: null,
     };
   },
   computed: {
-		...Vuex.mapGetters(['lastCallbackResult', 'allHandledEvents']),
+		...Vuex.mapGetters(['allHandledEvents']),
   },
   methods: {
     openForEvent(evt) {
@@ -166,16 +178,24 @@ export default {
     onSend() {
       this.validateBuffers();
       // send it server-side
-      Vue.socket.emit('event', {
+      let st = new Date();
+      let nonce = this.vuestroGenerateId(16);
+      Vue.socket.emit('volante', {
         eventType: this.sendEventType,
         eventArgs: this.sendEventArgs,
-        eventCallback: this.provideCallback,
+        eventCallback: nonce,
       });
       if (!this.provideCallback) {
         // close if not waiting on callback result
         this.onClose();
       } else {
-        this.$store.dispatch('setLastCallbackResult', null);
+        Vue.socket.once(nonce, (d) => {
+          console.log('got result!', d);
+          this.lastCallbackResult = {
+            elapsed: new Date() - st,
+            result: d
+          };
+        });
       }
     },
     onAddArg() {
