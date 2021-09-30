@@ -59,6 +59,7 @@ module.exports = {
     user: '',
     pass: '',
     path: '/volante-dashboard',
+    cors: '*',
   },
   data() {
     return {
@@ -136,6 +137,9 @@ module.exports = {
       this.$debug('starting volante-dashboard socket.io');
       this.io = socketIo(server, {
         path: `${this.path}/socket.io`,
+        cors: {
+          origin: this.cors,
+        },
       });
       this.socketEnabled = true;
       // let clients access io
