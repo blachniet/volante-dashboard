@@ -1,5 +1,4 @@
 const express = require('express');
-const socketIo = require('socket.io');
 const volante = require('volante');
 
 //
@@ -8,6 +7,17 @@ const volante = require('volante');
 //
 module.exports = {
   name: 'VolanteDashboard',
+  props: {
+    enabled: true,                  // enable dashboard
+    title: 'volante',               // title string for UI
+    version: volante.parentVersion, // version string for UI
+    statsInterval: 5000,            // ms interval to pull stats
+    statsHistory: 60,               // depth of stats history
+    user: '',                       // username for access to UI
+    pass: '',                       // password for access to UI
+    path: '/volante-dashboard',     // path to dashboard
+    cors: '*',                      // passed to cors module
+  },
   init() {
     this.updateStats();
     // start timer to send stats to all clients
@@ -49,17 +59,6 @@ module.exports = {
   },
   done() {
     this.timer && clearInterval(this.timer);
-  },
-  props: {
-    enabled: true,
-    title: 'volante',
-    version: volante.parentVersion,
-    statsInterval: 5000,
-    statsHistory: 60,
-    user: '',
-    pass: '',
-    path: '/volante-dashboard',
-    cors: '*',
   },
   data() {
     return {
@@ -114,12 +113,12 @@ module.exports = {
         app.get(`${this.path}/static/volante-dashboard-config.js`, (req, res) => {
           res.send(`(function() { window.basePath = '${this.path}'; })();`);
         });
-        this.$log(`listening on ${this.path}`);
+        this.$ready(`listening on ${this.path}`);
       }
     },
     // start socket.io when express is ready
-    'VolanteExpress.listening'(obj) {
-      this.startSocketIO(obj.server);
+    'VolanteExpress.socket.io'(io) {
+      this.registerSocketIoHandlers(io);
     },
     // sanity check event
     'hello.world'(...args) {
@@ -131,23 +130,15 @@ module.exports = {
   },
   methods: {
     //
-    // methods starts the socket.io server and handles events to/from client side
+    // method adds handlers for events to/from client side
     //
-    startSocketIO(server) {
-      this.$debug('starting volante-dashboard socket.io');
-      this.io = socketIo(server, {
-        path: `${this.path}/socket.io`,
-        cors: {
-          origin: this.cors,
-        },
-      });
+    registerSocketIoHandlers(io) {
+      this.$log('registering volante-dashboard socket.io handlers');
+      this.io = io;
       this.socketEnabled = true;
-      // let clients access io
-      this.$emit('VolanteDashboard.socket.io', this.io);
       // broadcast client connections to listeners
       this.io.on('connection', (client) => {
         this.sendAppInfo(client);
-        this.$emit('VolanteDashboard.socket.io.connection', client);
       });
       // use room for volante-dashboard specific socket.io traffic
       this.io.of('/volante-dashboard').on('connection', (client) => {
@@ -311,7 +302,7 @@ if (require.main === module) {
 
   hub.emit('VolanteExpress.update', {
     bind: '0.0.0.0',
-    port: 3030,
+    port: 8080,
     middleware: [
       (req, res, next) => {
         if (req.url === '/static/volante-dashboard-config.js') {

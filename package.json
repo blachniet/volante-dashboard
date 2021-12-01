@@ -15,8 +15,7 @@
   },
   "dependencies": {
     "express": "^4.16.4",
-    "socket.io": "^4.2.0",
-    "socket.io-client": "^4.2.0"
+    "socket.io-client": "^4.4.0"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^3.0.0",
@@ -28,15 +27,15 @@
     "optimize-css-assets-webpack-plugin": "^5.0.4",
     "terser-webpack-plugin": "^4.2.3",
     "url-loader": "^4.1.0",
-    "volante": "^3.12.1",
-    "volante-console": "^2.3.2",
-    "volante-express": "^2.10.0",
+    "volante": "^4.2.0",
+    "volante-console": "^3.3.1",
+    "volante-express": "^5.0.0",
     "vue": "^2.6.12",
     "vue-loader": "^15.9.1",
     "vue-router": "^3.4.9",
     "vue-style-loader": "^4.1.2",
     "vue-template-compiler": "^2.6.12",
-    "vuestro": "^8.46.1",
+    "vuestro": "^8.53.0",
     "vuex": "^3.5.1",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",

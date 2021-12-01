@@ -7,7 +7,7 @@ export default {
   install(Vue, options) {
 
     Vue.socket = io('/volante-dashboard', {
-      path: `${window.basePath}/socket.io`,
+      path: `/socket.io`,
     });
 
     // handler for volante events
